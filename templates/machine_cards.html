@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="row">
+  {% for machine in machines %}
+    <div class="col-md-6 mb-3">
+      <div class="card h-100">
+        <div class="card-body">
+          <h5 class="card-title">{{ machine.name }}</h5>
+          <div class="form-check">
+            <input class="form-check-input machine-checkbox" type="checkbox" 
+                   value="{{ machine.id }}" id="machine_{{ machine.id }}">
+            <label class="form-check-label" for="machine_{{ machine.id }}">
+              Выбрать для бронирования
+            </label>
+          </div>
+          <p class="card-text">
+            <strong>Модель:</strong> {{ machine.model }}<br>
+            <strong>Аренда в месяц:</strong> {{ machine.monthly_rent }} руб.<br>
+            <strong>Аренда за год:</strong> {{ machine.yearly_rent }} руб.<br>
+            <strong>Статус:</strong> 
+            <span class="badge {% if machine.is_available %}bg-success{% else %}bg-danger{% endif %}">
+              {% if machine.is_available %}Доступен{% else %}Забронирован{% endif %}
+            </span><br>
+            <strong>Место размещения:</strong> {{ machine.address }}<br>
+            <strong>Срок окупаемости:</strong> {{ machine.payback_period }} мес.
+          </p>
+        </div>
+      </div>
+    </div>
+  {% empty %}
+    <div class="col-12">
+      <p class="text-center">Нет доступных торговых аппаратов</p>
+    </div>
+  {% endfor %}
+</div>
+{% endblock %}

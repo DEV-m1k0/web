@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h2>Отвязка модема у автомата: {{ machine.name }}</h2>
+<p>Вы уверены, что хотите отвязать модем?</p>
+
+<form method="post">
+    {% csrf_token %}
+    <button type="submit">Да, отвязать модем</button>
+    <a href="{% url 'ta_list' %}">Отмена</a>
+</form>
+{% endblock %}

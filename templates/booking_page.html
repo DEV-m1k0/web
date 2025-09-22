@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h2>Бронирование автомата: {{ machine.name }}</h2>
+
+{% if messages %}
+  <ul>
+    {% for m in messages %}
+      <li class="{{ m.tags }}">{{ m }}</li>
+    {% endfor %}
+  </ul>
+{% endif %}
+
+<form method="post">
+  {% csrf_token %}
+  {{ form.as_p }}
+  <button type="submit">Отправить бронирование</button>
+  <a href="{% url 'ta_list' %}">Отмена</a>
+</form>
+{% endblock %}

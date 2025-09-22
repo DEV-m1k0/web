@@ -1,0 +1,228 @@
+{% extends 'base.html' %}
+{% load static  %}
+{% block link %}
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="{% static 'css/vending_cards.css' %}">
+{% endblock %}
+{% block content %}
+<h2>Торговые автоматы</h2>
+<div class="ta-filters">
+  <form method="get" style="display: flex; justify-content: space-between;">
+    {% csrf_token %}
+    <div class="">
+      Показать {{filter.count_ta}} записей
+    </div>
+    <div class="">
+      {{filter.search}}
+    </div>
+    <div class="" style="display: flex; justify-content: center;">
+      <button type="submit" class="btn btn-primary">Применить</button>
+    </div>
+  </form>
+</div>
+{% if page_obj.paginator.count == 0 %}
+  <p>При первом входе: оформите ТА в аренду (модальное окно демонстрация)</p>
+{% endif %}
+<table class="ta-table">
+  <thead><tr><th>ID</th><th>Название</th><th>Модель</th><th>Компания</th><th>Модем</th><th>Адрес</th><th>В работе с</th><th>Действия</th></tr></thead>
+  <tbody>
+  {% for m in page_obj %}
+    <tr class="{% cycle 'odd' 'even' %}">
+      <td>{{ m.machine.id_code }}</td>
+      <td>{{ m.machine.name }}</td>
+      <td>{{ m.machine.model }}</td>
+      <td>{{ m.machine.company.name }}</td>
+      <td>{{ m.machine.modem }}</td>
+      <td>{{ m.machine.address }}</td>
+      <td>{{ m.start_date }}</td>
+      <td>
+        <a href="{% url 'ta_edit' m.machine.pk %}">🖋️</a> 
+        <a href="{% url 'ta_delete' m.machine.pk %}">🗑️</a> 
+        <a href="{% url 'ta_unlink_modem' m.machine.pk %}">🔓</a>
+      </td>
+    </tr>
+  {% empty %}
+    <tr><td colspan="7">В таблице отсутствуют данные</td></tr>
+  {% endfor %}
+  </tbody>
+</table>
+<div class="" style="display: flex; justify-content: space-between;">
+  <div class="pagination">
+    <span class="step-links">
+      {% if page_obj.has_previous %}
+        <a href="?page={{ page_obj.previous_page_number }}{% if request.GET.count_ta %}&count_ta={{ request.GET.count_ta }}{% endif %}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}">предыдущая</a>
+      {% endif %}
+
+      <span class="current">
+        Страница {{ page_obj.number }} из {{ page_obj.paginator.num_pages }}
+      </span>
+
+      {% if page_obj.has_next %}
+        <a href="?page={{ page_obj.next_page_number }}{% if request.GET.count_ta %}&count_ta={{ request.GET.count_ta }}{% endif %}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}">следующая</a>
+      {% endif %}
+    </span>
+  </div>
+  <div class="ta-export" style="margin-top: 10px;">
+    <button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#machineSelectionModal">Добавить</button>
+    <!-- Modal -->
+    <div class="modal fade" id="machineSelectionModal" tabindex="-1" aria-labelledby="machineSelectionModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-md">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h1 class="modal-title fs-5" id="machineSelectionModalLabel">Выбор торговых аппаратов</h1>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body">
+            <!-- Секция фильтров -->
+            <div class="filter-section">
+              <div class="row">
+                  <div class="col-md-6">
+                      <div class="mb-3">
+                          <label for="searchInput" class="form-label">Поиск по названию или ID</label>
+                          <input type="text" class="form-control" id="searchInput" placeholder="Поиск...">
+                      </div>
+                  </div>
+                  <div class="col-md-6">
+                      <div class="mb-3">
+                          <label for="availabilityFilter" class="form-label">Доступность</label>
+                          <select class="form-select" id="availabilityFilter">
+                              <option value="all">Все</option>
+                              <option value="available">Доступен</option>
+                              <option value="unavailable">Заблокирован</option>
+                          </select>
+                      </div>
+                  </div>
+              </div>
+            </div>
+            <!-- Контейнер для карточек -->
+            <div id="machines-container" class="mt-3">
+              {% for machine in machines %}
+                <div class="card" id="card-machine">
+                  <div class="vending-image">
+                    <i class="bi bi-cup-hot-fill" style="font-size: 3rem;"></i>
+                  </div>
+                    
+                  {% if machine.is_available %}
+                    <!-- Бейдж доступности -->
+                    <span class="status-badge bg-success">Доступен</span>
+                  {% else %}
+                    <span class="status-badge bg-danger">Забронирован</span>
+                  {% endif %}
+                  <div class="card-header">
+                      <h5 class="card-title mb-0 machine-name">{{machine.name}}</h5>
+                      <p class="text-muted mb-0 machine-id">{{machine.id_code}}</p>
+                  </div>
+
+                  <div class="card-body">
+                    <div class="d-flex mb-3">
+                        <div class="icon-wrapper bg-primary">
+                            <i class="bi bi-building text-white"></i>
+                        </div>
+                        <div>
+                            <h6 class="mb-0">{{machine.company.name}}</h6>
+                            <small class="text-muted">Владелец</small>
+                        </div>
+                    </div>
+                      
+                    <div class="d-flex mb-3">
+                        <div class="icon-wrapper bg-info">
+                            <i class="bi bi-geo-alt text-white"></i>
+                        </div>
+                        <div>
+                            <h6 class="mb-0">{{machine.company.address}}</h6>
+                            <small class="text-muted">Адрес</small>
+                        </div>
+                    </div>
+                      
+                    <div class="row mb-3">
+                        <div class="col-6">
+                            <small class="text-muted">Модель:</small>
+                            <p class="mb-0">{{machine.model}}</p>
+                        </div>
+                        <div class="col-6">
+                            <small class="text-muted">Модем:</small>
+                            <p class="mb-0">{{machine.modem}}</p>
+                        </div>
+                    </div>
+                      
+                    <div class="mb-3">
+                        <small class="text-muted">В работе с:</small>
+                        <p class="mb-0">{{machine.in_work_since}}</p>
+                    </div>
+                      
+                    <hr>
+                      
+                    <div class="financial-info">
+                      <h6 class="mb-3">Финансовая информация</h6>
+                      <div class="d-flex justify-content-between mb-2">
+                        <span>Общий доход:</span>
+                        <strong>{{machine.total_income}} ₽</strong>
+                      </div>
+                      <div class="d-flex justify-content-between mb-2">
+                        <span>Аренда в месяц:</span>
+                        <strong>{{machine.monthly_rent}} ₽</strong>
+                      </div>
+                      <div class="d-flex justify-content-between mb-2">
+                        <span>Аренда в год:</span>
+                        <strong>{{machine.yearly_rent}} ₽</strong>
+                      </div>
+                      <div class="d-flex justify-content-between">
+                        <span>Срок окупаемости:</span>
+                        <strong>{{machine.payback_period}} мес</strong>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="">
+                    <a href="{% url 'booking_page' machine.id %}" class="btn btn-primary w-100 {% if not machine.is_available %}disabled{% endif %}">Перейти к бронированию</a>
+                  </div>
+                </div>
+              {% endfor %}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <a href="{% url 'ta_export' %}?{% if request.GET.search %}search={{ request.GET.search }}{% endif %}" class="btn btn-primary">
+        Экспорт в CSV
+    </a>
+  </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+
+  <script>
+    const availabilityFilter = document.getElementById("availabilityFilter");
+    const searchInput = document.getElementById("searchInput");
+    const cardContainer = document.querySelectorAll("#card-machine");
+
+
+    function checkFilters() {
+      cardContainer.forEach(element => {
+      const status = element.getElementsByClassName("status-badge").item(0).textContent
+      const machineName = element.getElementsByClassName("machine-name").item(0).textContent
+      const machineId = element.getElementsByClassName("machine-id").item(0).textContent
+
+      if (availabilityFilter.value === "available" && status !== "Доступен") {
+        element.style.display = "none";
+      } else if (availabilityFilter.value === "unavailable" && status !== "Забронирован") {
+        element.style.display = "none";
+      } else if (searchInput.value && !machineName.toLowerCase().includes(searchInput.value.toLowerCase()) && !machineId.toLowerCase().includes(searchInput.value.toLowerCase())) {
+        element.style.display = "none";
+      } else {
+        element.style.display = "block";
+      }
+    });
+    }
+
+    availabilityFilter.addEventListener("change", function() {
+      checkFilters();
+    });
+
+    searchInput.addEventListener("input", function() {
+      checkFilters();
+    });
+  </script>
+
+{% endblock %}

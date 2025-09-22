@@ -1,0 +1,5 @@
+[
+  {"model": "core.company", "pk": 1, "fields": {"name": "ООО Торговые Автоматы", "address":"Москва, ул. Тестовая 1", "contacts":"+7 900 000-00-00"}},
+  {"model": "core.vendingmachine", "pk": 1, "fields": {"id_code":"903823","name":"БЦ Московский","model":"Saeco Cristallo 400","company":1,"modem":"1824100025","address":"Суворова 121 у входа","in_work_since":"2018-05-12","status":"working","total_income":"12500.00"}},
+  {"model": "core.vendingmachine", "pk": 2, "fields": {"id_code":"903828","name":"ПП Магнит","model":"Unicum Rosso","company":1,"modem":"1824100029","address":"Академическая 15 улица, вход","in_work_since":"2018-05-13","status":"working","total_income":"8200.00"}}
+]

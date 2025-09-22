@@ -1,0 +1,94 @@
+{% extends "base.html" %}
+{% load static %}
+{% block content %}
+<div class="auth-card" style="max-width:520px;margin:20px auto;padding:20px;border-radius:10px;box-shadow:0 8px 30px rgba(10,20,40,0.06);background:#fff;">
+  <h2 style="margin-top:0;margin-bottom:10px;">Вход в личный кабинет</h2>
+
+  {# show non-field errors (e.g. invalid login) #}
+  {% if form.non_field_errors %}
+    <div class="form-errors" style="margin-bottom:12px;color:#b00020;">
+      {% for err in form.non_field_errors %}
+        <div>{{ err }}</div>
+      {% endfor %}
+    </div>
+  {% endif %}
+
+  <form method="post" action="{% url 'login' %}" id="login-form" novalidate>
+    {% csrf_token %}
+
+    {# preserve next param if present #}
+    {% if next %}
+      <input type="hidden" name="next" value="{{ next }}">
+    {% elif request.GET.next %}
+      <input type="hidden" name="next" value="{{ request.GET.next }}">
+    {% endif %}
+
+    <div class="form-row" style="margin-bottom:12px;">
+      <label for="id_username" style="display:block;font-weight:600;margin-bottom:6px;">Email / логин</label>
+      <input autofocus autocapitalize="off" autocomplete="username" id="id_username" name="username" type="text"
+             value="{{ request.POST.username|default:'' }}" required
+             style="width:100%;padding:10px;border-radius:8px;border:1px solid #e6eef6;font-size:14px;">
+      {% if form.username.errors %}
+        <div style="color:#b00020;margin-top:6px;font-size:13px;">
+          {% for e in form.username.errors %}{{ e }}{% endfor %}
+        </div>
+      {% endif %}
+    </div>
+
+    <div class="form-row" style="margin-bottom:12px;position:relative;">
+      <label for="id_password" style="display:block;font-weight:600;margin-bottom:6px;">Пароль</label>
+      <input autocomplete="current-password" id="id_password" name="password" type="password" required
+             style="width:100%;padding:10px;border-radius:8px;border:1px solid #e6eef6;font-size:14px;">
+      <button id="pwd-toggle" type="button" aria-label="Показать/скрыть пароль"
+              style="position:absolute;right:10px;top:36px;border:none;background:transparent;cursor:pointer;font-size:13px;">Показать</button>
+      {% if form.password.errors %}
+        <div style="color:#b00020;margin-top:6px;font-size:13px;">
+          {% for e in form.password.errors %}{{ e }}{% endfor %}
+        </div>
+      {% endif %}
+    </div>
+
+    <div class="form-row" style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
+      <label style="display:flex;align-items:center;gap:8px;font-size:14px;">
+        <input type="checkbox" name="remember_me" id="id_remember" style="transform:scale(1.1);">
+        <span>Запомнить меня</span>
+      </label>
+    </div>
+
+    <div style="display:flex;gap:10px;align-items:center">
+      <button type="submit" style="background:#2e86de;color:#fff;padding:10px 14px;border-radius:8px;border:none;font-weight:600;cursor:pointer;">
+        Войти
+      </button>
+      <a href="{% url 'register' %}" style="padding:10px 12px;border-radius:8px;border:1px solid #e6eef6;text-decoration:none;color:#333;background:#f8fbff;">Регистрация</a>
+    </div>
+  </form>
+
+  <hr style="margin:18px 0;border:none;border-top:1px solid #f0f4f7">
+</div>
+
+<script>
+/* Show / hide password control and small UI niceties */
+document.addEventListener('DOMContentLoaded', function(){
+  const pwd = document.getElementById('id_password');
+  const btn = document.getElementById('pwd-toggle');
+  if(!pwd || !btn) return;
+  btn.addEventListener('click', function(e){
+    e.preventDefault();
+    if(pwd.type === 'password'){ pwd.type = 'text'; btn.textContent = 'Скрыть'; }
+    else { pwd.type = 'password'; btn.textContent = 'Показать'; }
+  });
+
+  // submit on Enter from password (browser already does), but we can show small animation
+  const form = document.getElementById('login-form');
+  form && form.addEventListener('submit', function(){
+    // disable submit briefly to prevent double submit
+    const btn = form.querySelector('button[type=submit]');
+    if(btn){ btn.disabled = true; setTimeout(()=>btn.disabled=false, 2000); }
+  });
+
+  // focus username if empty
+  const user = document.getElementById('id_username');
+  if(user && user.value.trim()===''){ user.focus(); }
+});
+</script>
+{% endblock %}

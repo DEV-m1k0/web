@@ -1,0 +1,114 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block link %}<link rel="stylesheet" href="{% static 'css/register.css' %}">{% endblock %}
+{% block content %}
+<div class="auth-container">
+  <div class="auth-card">
+    <div class="auth-header">
+      <h2>Регистрация франчайзи</h2>
+      <p>Заполните форму ниже чтобы создать аккаунт</p>
+    </div>
+
+    <form method="post" id="register-form" novalidate class="auth-form">
+      {% csrf_token %}
+
+      <div class="form-group">
+        <label for="id_email" class="form-label">Email</label>
+        {{ form.email }}
+        <div class="form-hint">На этот email будет отправлено подтверждение</div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="id_password1" class="form-label">Пароль</label>
+          <div class="password-field">
+            {{ form.password1 }}
+            <button type="button" id="password-toggle" class="password-toggle" aria-label="Показать пароль">
+              <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M10 4.375C3.75 4.375 1.25 10 1.25 10C1.25 10 3.75 15.625 10 15.625C16.25 15.625 18.75 10 18.75 10C18.75 10 16.25 4.375 10 4.375Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M10 12.5C11.3807 12.5 12.5 11.3807 12.5 10C12.5 8.61929 11.3807 7.5 10 7.5C8.61929 7.5 7.5 8.61929 7.5 10C7.5 11.3807 8.61929 12.5 10 12.5Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </button>
+          </div>
+          <div class="form-hint">
+            Пароль должен содержать минимум 8 символов, минимум одну цифру и один спец. символ.
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="id_password2" class="form-label">Повторите пароль</label>
+          <div class="password-field">
+            {{ form.password2 }}
+          </div>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Математическая CAPTCHA</label>
+        <div class="captcha-container">
+          <div id="captcha-question" class="captcha-question">Загрузка...</div>
+          <div class="captcha-controls">
+            <input type="text" id="captcha-answer" name="captcha_answer" aria-label="Ответ на CAPTCHA" required class="captcha-input" />
+            <button type="button" id="captcha-check" class="btn-secondary">Проверить</button>
+            <button type="button" id="captcha-refresh" class="btn-icon" aria-label="Обновить CAPTCHA">
+              <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M16.3666 6.13333C15.3999 4.86667 14.0333 4 12.4999 4C9.73325 4 7.48325 6.25 7.48325 9.01667C7.48325 11.7833 9.73325 14.0333 12.4999 14.0333C14.5833 14.0333 16.3333 12.6833 16.9666 10.7833H16.3666C15.7666 12.2667 14.2999 13.3333 12.4999 13.3333C10.1499 13.3333 8.23325 11.4167 8.23325 9.06667C8.23325 6.71667 10.1499 4.8 12.4999 4.8C13.7166 4.8 14.8166 5.31667 15.5999 6.16667L13.3333 8.43333H17.4999V4.26667L16.3666 6.13333Z" fill="currentColor"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <button type="button" id="send-email-code" class="btn-secondary full-width">
+          <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg" style="margin-right: 8px;">
+            <path d="M15 3H3C2.175 3 1.5075 3.675 1.5075 4.5L1.5 13.5C1.5 14.325 2.175 15 3 15H15C15.825 15 16.5 14.325 16.5 13.5V4.5C16.5 3.675 15.825 3 15 3ZM15 6L9 9.75L3 6V4.5L9 8.25L15 4.5V6Z" fill="currentColor"/>
+          </svg>
+          Отправить код подтверждения на Email
+        </button>
+      </div>
+
+      <div class="form-group">
+        <label for="email-code" class="form-label">Код подтверждения (из письма)</label>
+        <div class="code-verification">
+          <input type="text" id="email-code" disabled class="code-input" />
+          <button type="button" id="verify-email-code" class="btn-secondary">Проверить</button>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="id_franchise_code" class="form-label">Код франчайзи</label>
+        {{ form.franchise_code }}
+        <div class="form-hint">Если у вас есть код франчайзи, введите его здесь</div>
+      </div>
+
+      <div class="form-submit">
+        <button type="submit" id="submit-btn" class="btn-primary full-width" disabled>Зарегистрироваться</button>
+      </div>
+    </form>
+
+    <div class="auth-footer">
+      <p>Уже есть аккаунт? <a href="{% url 'login' %}">Войдите здесь</a></p>
+    </div>
+  </div>
+</div>
+
+<!-- Modal to show generated email code (emulation) -->
+<div id="email-modal" class="modal" aria-hidden="true" style="display:none;">
+  <div class="modal-overlay"></div>
+  <div class="modal-content" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+    <div class="modal-header">
+      <h3 id="modal-title">Эмуляция отправки письма</h3>
+      <button class="modal-close" aria-label="Закрыть">✕</button>
+    </div>
+    <div class="modal-body">
+      <p>На указанный email был сгенерирован код подтверждения:</p>
+      <div class="code-display" id="modal-code"></div>
+      <p>Скопируйте код и вставьте его в поле «Код подтверждения» на форме.</p>
+    </div>
+  </div>
+</div>
+
+<script src="{% static 'js/captcha.js' %}"></script>
+<script src="{% static 'js/register.js' %}"></script>
+{% endblock %}

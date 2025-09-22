@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h2>Личный кабинет. Главная</h2>
+
+<div class="cards">
+
+  <div class="card">
+    <h3>Эффективность сети</h3>
+    <p>Общий доход: {{ efficiency.total_income }} ₽</p>
+    <p>Средний доход на автомат: {{ efficiency.avg_income|floatformat:2 }} ₽</p>
+    <p>Количество автоматов: {{ efficiency.machine_count }}</p>
+  </div>
+
+  <div class="card">
+    <h3>Состояние сети</h3>
+    <p>Работают: {{ status_counts.working }}</p>
+    <p>На обслуживании: {{ status_counts.maintenance }}</p>
+    <p>Сломаны: {{ status_counts.broken }}</p>
+  </div>
+
+  <div class="card">
+    <h3>Сводка</h3>
+    <p>Товаров с низким остатком: {{ summary.low_stock_count }}</p>
+    <p>Автоматов без свежего сервиса (>30 дней): {{ summary.stale_service_count }}</p>
+  </div>
+
+</div>
+{% endblock %}

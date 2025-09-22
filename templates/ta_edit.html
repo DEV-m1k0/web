@@ -1,0 +1,118 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container my-5">
+  <div class="row justify-content-center">
+    <div class="col-lg-8">
+      <div class="card shadow-sm">
+        <div class="card-header d-flex justify-content-between align-items-center">
+          <div>
+            <h4 class="mb-0">Редактирование автомата</h4>
+            <small class="text-muted">{{ machine.name }} ({{ machine.id_code }})</small>
+          </div>
+          <div>
+            {# status badge mapped to bootstrap colors #}
+            {% if machine.status == 'working' %}
+              <span class="badge bg-success">Работает</span>
+            {% elif machine.status == 'maintenance' %}
+              <span class="badge bg-warning text-dark">На обслуживании</span>
+            {% elif machine.status == 'broken' %}
+              <span class="badge bg-danger">Сломан</span>
+            {% else %}
+              <span class="badge bg-secondary">{{ machine.status }}</span>
+            {% endif %}
+          </div>
+        </div>
+
+        <div class="card-body">
+          <form method="post" novalidate>
+            {% csrf_token %}
+
+            {% if form.non_field_errors %}
+              <div class="alert alert-danger">
+                {{ form.non_field_errors }}
+              </div>
+            {% endif %}
+
+            <div class="row g-3">
+              <div class="col-md-6">
+                <label class="form-label">{{ form.id_code.label }}</label>
+                {{ form.id_code }}
+                {% if form.id_code.errors %}
+                  <div class="invalid-feedback d-block">{{ form.id_code.errors.as_text|striptags }}</div>
+                {% endif %}
+              </div>
+
+              <div class="col-md-6">
+                <label class="form-label">{{ form.name.label }}</label>
+                {{ form.name }}
+                {% if form.name.errors %}
+                  <div class="invalid-feedback d-block">{{ form.name.errors.as_text|striptags }}</div>
+                {% endif %}
+              </div>
+
+              <div class="col-md-6">
+                <label class="form-label">{{ form.model.label }}</label>
+                {{ form.model }}
+                {% if form.model.errors %}
+                  <div class="invalid-feedback d-block">{{ form.model.errors.as_text|striptags }}</div>
+                {% endif %}
+              </div>
+
+              <div class="col-md-6">
+                <label class="form-label">{{ form.company.label }}</label>
+                {{ form.company }}
+                {% if form.company.errors %}
+                  <div class="invalid-feedback d-block">{{ form.company.errors.as_text|striptags }}</div>
+                {% endif %}
+              </div>
+
+              <div class="col-md-6">
+                <label class="form-label">{{ form.modem.label }}</label>
+                {{ form.modem }}
+                {% if form.modem.errors %}
+                  <div class="invalid-feedback d-block">{{ form.modem.errors.as_text|striptags }}</div>
+                {% endif %}
+              </div>
+
+              <div class="col-md-6">
+                <label class="form-label">{{ form.address.label }}</label>
+                {{ form.address }}
+                {% if form.address.errors %}
+                  <div class="invalid-feedback d-block">{{ form.address.errors.as_text|striptags }}</div>
+                {% endif %}
+              </div>
+
+              <div class="col-12">
+                <label class="form-label">{{ form.status.label }}</label>
+                {{ form.status }}
+                {% if form.status.errors %}
+                  <div class="invalid-feedback d-block">{{ form.status.errors.as_text|striptags }}</div>
+                {% endif %}
+              </div>
+            </div>
+
+            <hr class="my-4">
+
+            <div class="d-flex justify-content-between align-items-center">
+              <div>
+                <a href="{% url 'ta_list' %}" class="btn btn-outline-secondary me-2">Отмена</a>
+                <button type="submit" class="btn btn-primary">Сохранить</button>
+              </div>
+
+              <div class="text-end small text-muted">
+                <div>Доход всего: <strong>{{ machine.total_income }}</strong></div>
+                <div>Аренда / мес: <strong>{{ machine.monthly_rent }}</strong></div>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <div class="text-center mt-3 small text-muted">
+        Изменения сохраняются в базе. Если вы хотите редактировать дополнительные поля, откройте страницу подробностей автомата.
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

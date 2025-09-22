@@ -1,0 +1,121 @@
+{% load static %}
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>ООО Торговые Автоматы - Demo</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+  <link rel="stylesheet" href="{% static 'css/style.css' %}">
+  {% block link %}{% endblock %}
+</head>
+<body>
+  <div id="app">
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-top"> 
+        <div class="logo">
+          <div class="brand"> 
+            <div class="brand-line1">ООО</div> 
+            <div class="brand-line2">Торговые Автоматы</div> 
+          </div> 
+        </div> 
+        <button id="sidebar-toggle" class="hamburger" aria-label="Toggle menu">☰</button>
+      </div>
+
+      <nav class="nav"> 
+        {% if not user.is_authenticated %}
+          <a class="nav-item {% if request.path == '/register/' %}active{% endif %}" href="/register/">Регистрация франчайзи</a>
+          <a class="nav-item" href="{% url 'login' %}">Войти</a>
+        {% else %}
+          <a class="nav-item {% if request.path == '/' %}active{% endif %}" href="/">Главная</a> 
+          {% with request.path|slice:":3" as p3 %} 
+            <a class="nav-item {% if p3 == '/ta' %}active{% endif %}" href="/ta/">Торговые автоматы</a> 
+          {% endwith %} 
+        {% endif %} 
+        <hr class="nav-sep"> 
+      </nav> 
+      <div class="sidebar-footer"> 
+      </div>
+    </aside>
+
+    <div class="main">
+      <!-- TOPBAR: замените существующий header этим блоком -->
+      <header class="topbar">
+        <div class="topbar-left">
+          <h1 class="app-title">ООО Торговые Автоматы</h1>
+        </div>
+
+        <div class="topbar-right">
+          <!-- кнопка "колокольчик" - центр уведомлений -->
+          <div class="notif-toggle" id="notif-toggle" title="Уведомления" aria-expanded="false">
+            <span class="bell">🔔</span>
+            <span class="notif-badge" id="notif-badge" aria-hidden="true">0</span>
+          </div>
+
+          {% if user.is_authenticated %}
+            <div class="user-block" id="user-block">
+              <div class="user-badge" id="user-badge">{{ user.username|slice:":1"|upper }}</div>
+              <div class="user-info">
+                <div class="user-name">{{ user.get_full_name|default:user.username }}</div>
+                <div class="user-actions">
+                  <form method="post" action="{% url 'logout' %}" style="display:block;">
+                    {% csrf_token %}
+                    <button type="submit" class="link-button">Выйти</button>
+                  </form>
+                </div>
+              </div>
+            </div>
+          {% else %}
+            <a class="top-action" href="{% url 'login' %}">Войти</a>
+            <a class="top-action" href="/register/">Регистрация</a>
+          {% endif %}
+        </div>
+      </header>
+
+      <main class="content">
+        {% block content %}{% endblock %}
+      </main>
+    </div>
+  </div>
+
+  <!-- Toast container -->
+  <div id="toast-root" aria-live="polite" aria-atomic="true"></div>
+
+  <!-- Notification center panel (скрытая по умолчанию) -->
+  <aside id="notification-center" class="notification-center" aria-hidden="true">
+    <div class="nc-header">
+      <h3>Уведомления</h3>
+      <div class="nc-controls">
+        <button id="nc-mark-read">Пометить все как прочитанные</button>
+        <button id="nc-clear">Очистить историю</button>
+      </div>
+    </div>
+    <div id="nc-list" class="nc-list">
+      <!-- История уведомлений будет отрисована сюда -->
+    </div>
+    <div class="nc-empty" id="nc-empty" style="display:none">Пока нет уведомлений</div>
+  </aside>
+
+  <script>
+    window.DJ_MESSAGES = [
+      {% for m in messages %}
+        {"tags":"{{ m.tags }}", "message":"{{ m|escapejs }}" }{% if not forloop.last %},{% endif %}
+      {% empty %}{% endfor %}
+    ];
+  </script>
+
+  <!-- Подключаем библиотеки внизу (в строгом порядке) -->
+   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
+  <!-- jQuery (нужен вашему inline-коду) -->
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+  <!-- Bootstrap 5 bundle (включает Popper v2). Подключаем ОДИН раз -->
+  <!-- <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"></script> -->
+
+  <!-- Локальные скрипты, которые могут использовать Bootstrap/jQuery -->
+  <script src="{% static 'js/captcha.js' %}"></script>
+  <script src="{% static 'js/notifications.js' %}"></script>
+
+  {% block scripts %}{% endblock %}
+</body>
+</html>

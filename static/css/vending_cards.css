@@ -1,0 +1,52 @@
+.card-machine {
+            transition: transform 0.3s, box-shadow 0.3s;
+            border-radius: 12px;
+            overflow: hidden;
+            height: 100%;
+        }
+        .card-machine:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+        .status-badge {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            font-size: 0.8rem;
+            padding: 5px 10px;
+            border-radius: 20px;
+            color: white;
+            font-weight: 600;
+        }
+        .availability-badge {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+        }
+        .card-header {
+            background: linear-gradient(120deg, #f8f9fa 0%, #e9ecef 100%);
+            border-bottom: 1px solid rgba(0,0,0,0.1);
+        }
+        .financial-info {
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            padding: 12px;
+        }
+        .icon-wrapper {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 10px;
+        }
+        .vending-image {
+            height: 180px;
+            object-fit: cover;
+            background-color: #e9ecef;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #6c757d;
+        }
