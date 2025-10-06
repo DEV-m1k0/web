@@ -146,6 +146,7 @@ def register_view(request):
     ALLOWED = getattr(settings, 'ALLOWED_FRANCHISE_CODES', ['FRANCHISE-1234', 'ABC-SECRET'])
 
     if request.method == 'POST':
+        print(request.POST)
         form = RegisterForm(request.POST)
         if form.is_valid():
             franchise = form.cleaned_data.get('franchise_code')

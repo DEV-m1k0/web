@@ -39,6 +39,12 @@ class BookingForm(forms.ModelForm):
     class Meta:
         model = Booking
         fields = ['start_date', 'end_date', 'ownership_type', 'insurance']
+        labels = {
+            "start_date": "С",
+            "end_date": "По",
+            "ownership_type": "Тип бронирования",
+            "insurance": "Страхование",
+        }
         widgets = {
             'start_date': forms.DateInput(attrs={'type': 'date'}),
             'end_date': forms.DateInput(attrs={'type': 'date'}),

@@ -5,7 +5,8 @@ document.addEventListener('DOMContentLoaded', function(){
 });
 
 document.addEventListener('DOMContentLoaded', function(){
-  const passwordInput = document.getElementById('id_password1');
+  const passwordInput1 = document.getElementById('id_password1');
+  const passwordInput2 = document.getElementById('id_password2');
   const passwordToggle = document.getElementById('password-toggle');
   const sendCodeBtn = document.getElementById('send-email-code');
   const verifyEmailBtn = document.getElementById('verify-email-code');
@@ -18,24 +19,24 @@ document.addEventListener('DOMContentLoaded', function(){
   if(submitBtn) submitBtn.disabled = true;
   if(franchiseInput) franchiseInput.disabled = true;
 
-  if(passwordToggle && passwordInput){
+  if(passwordToggle && passwordInput1){
     passwordToggle.addEventListener('click', function(e){
       e.preventDefault();
-      if(passwordInput.type === 'password'){ passwordInput.type = 'text'; passwordToggle.textContent='Скрыть'; }
-      else { passwordInput.type = 'password'; passwordToggle.textContent='Показать'; }
+      if(passwordInput1.type === 'password'){ passwordInput1.type = 'text'; passwordToggle.textContent='Скрыть'; }
+      else { passwordInput1.type = 'password'; passwordToggle.textContent='Показать'; }
     });
   }
 
   const pwdMsg = document.getElementById('password-msg');
-  if(passwordInput){
-    passwordInput.addEventListener('input', function(){
-      const v = passwordInput.value;
+  if(passwordInput1){
+    passwordInput1.addEventListener('input', function(){
+      const v = passwordInput1.value;
       let ok = true; let msgs = [];
       if(v.length < 8){ ok=false; msgs.push('мин 8 символов'); }
       if(!/\d/.test(v)){ ok=false; msgs.push('мин 1 цифра'); }
       if(!/[!@#$%^&*(),.?":{}|<>_\-+=\[\]\\/;\'`~]/.test(v)){ ok=false; msgs.push('мин 1 спец. символ'); }
-      if(ok){ passwordInput.classList.add('valid'); passwordInput.classList.remove('invalid'); pwdMsg.textContent='Пароль подходит'; pwdMsg.style.color='green'; }
-      else { passwordInput.classList.add('invalid'); passwordInput.classList.remove('valid'); pwdMsg.textContent='Требования: '+msgs.join(', '); pwdMsg.style.color='crimson'; }
+      if(ok){ passwordInput1.classList.add('valid'); passwordInput1.classList.remove('invalid'); pwdMsg.textContent='Пароль подходит'; pwdMsg.style.color='green'; }
+      else { passwordInput1.classList.add('invalid'); passwordInput1.classList.remove('valid'); pwdMsg.textContent='Требования: '+msgs.join(', '); pwdMsg.style.color='crimson'; }
     });
   }
 
@@ -118,11 +119,23 @@ document.addEventListener('DOMContentLoaded', function(){
       if(!currentEmailCode){ e.preventDefault(); alert('Подтвердите email (нажмите "Отправить код")'); return; }
       if(!(emailCodeInput && emailCodeInput.classList.contains('valid'))){ e.preventDefault(); alert('Введите корректный код подтверждения email'); return; }
       if(!(franchiseInput && franchiseInput.value.trim())){ e.preventDefault(); alert('Введите код франчайзи'); return; }
-      const pwd = passwordInput && passwordInput.value || '';
+      const pwd = passwordInput1 && passwordInput1.value || '';
       if(pwd.length<8 || !/\d/.test(pwd) || !/[!@#$%^&*(),.?":{}|<>_\-+=\[\]\\/;\'`~]/.test(pwd)){
         e.preventDefault(); alert('Пароль не соответствует требованиям'); return;
       }
-      // форма отправляется на сервер — сервер проверит franchise_code.
+      try {
+        fetch("http://localhost:8000/register/", {
+          method: 'POST',
+          body: JSON.stringify({
+            email: emailInput.innerText,
+            password1: passwordInput1.innerText,
+            password2: passwordInput2.innerText,
+            franchise_code: franchiseInput.innerText
+          })
+        })
+      } catch (error) {
+        console.log(error)
+      }
     });
   }
 });
